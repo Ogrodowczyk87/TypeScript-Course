@@ -1,11 +1,11 @@
 export class UserModule {
-  private users = [];
+  private users: { id: number; name: string }[] = [];
 
-  addUser(user) {
+  addUser(user: { id: number; name: string }) {
     this.users.push(user);
   }
 
-  removeUser(userId) {
+  removeUser(userId: number) {
     for (let i = 0; i < this.users.length; i++) {
       if (this.users[i].id == userId) {
         this.users.splice(i, 1);
@@ -14,7 +14,7 @@ export class UserModule {
     }
   }
 
-  getUser(userId) {
+  getUser(userId: number) {
     for (let user of this.users) {
       if (user.id == userId) {
         return user;
@@ -23,7 +23,7 @@ export class UserModule {
     return null;
   }
 
-  filterUsers(filterFn) {
+  filterUsers(filterFn: (user: { id: number; name: string }) => { isValid: boolean }) {
     return this.users.filter((user) => {
       let result = filterFn(user);
       return result.isValid;
