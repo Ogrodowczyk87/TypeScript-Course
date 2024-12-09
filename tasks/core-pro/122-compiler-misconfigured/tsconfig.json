@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2020",
     "moduleResolution": "node10",
     "allowImportingTsExtensions": true,
     "esModuleInterop": false,
@@ -8,6 +8,6 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
-    "strict": true
+    "strict": false
   }
 }
