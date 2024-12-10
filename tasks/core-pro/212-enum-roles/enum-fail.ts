@@ -1,11 +1,11 @@
 import { hasAccess, User } from './task.ts';
 
 const userEditor: User = {
-  role: 'edtor',
-  permissions: ['READ', 'wrajt'],
+  role: 'editor',
+  permissions: ['READ', 'write'],
 };
 
 const userViewer: User = {
   role: 'reader',
-  permissions: ['rid'],
+  permissions: ['read'],
 };

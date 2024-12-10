@@ -1,5 +1,6 @@
 import { hasAccess, User, UserPermission, UserRole } from './task.ts';
 
+
 const userEditor: User = {
   role: UserRole.EDITOR,
   permissions: [UserPermission.READ, UserPermission.WRITE],
