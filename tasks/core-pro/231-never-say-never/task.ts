@@ -7,6 +7,7 @@ Dodano nowy typ zdarzenia, ale nie został on uwzględniony w funkcji obsługi, 
 Aby się z tym uporać, dodaj obsługę logowania nowego zdarzenia zgodnie z wzorcem "Zmieniono rozmiar na ${event.width}x${event.height}"
 */
 
+
 export type Event =
   | { type: 'click'; x: number; y: number }
   | { type: 'keydown'; key: string }
@@ -21,6 +22,9 @@ export function handleEvent(event: Event) {
     case 'keydown':
       console.log(`Naciśnięto klawisz ${event.key}`);
       break;
+    case 'resize':
+      console.log(`Zmieniono rozmiar na ${event.width}x${event.height}`);
+      break;
     default:
       const _exhaustiveCheck = event;
       throw new Error(`Nieobsługiwane zdarzenie: ${JSON.stringify(_exhaustiveCheck)}`);
@@ -28,4 +32,4 @@ export function handleEvent(event: Event) {
 }
 
 const resizeEvent: Event = { type: 'resize', width: 1024, height: 768 };
-handleEvent(resizeEvent);
+handleEvent(resizeEvent) 
