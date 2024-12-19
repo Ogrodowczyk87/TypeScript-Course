@@ -12,6 +12,7 @@ export type Event =
   | { type: 'keydown'; key: string }
   | { type: 'resize'; width: number; height: number };
 
+
 export function handleEvent(event: Event) {
   switch (event.type) {
     case 'click':
@@ -21,7 +22,7 @@ export function handleEvent(event: Event) {
       console.log(`Naciśnięto klawisz ${event.key}`);
       break;
     default:
-      const _exhaustiveCheck: never = event;
+      const _exhaustiveCheck = event;
       throw new Error(`Nieobsługiwane zdarzenie: ${JSON.stringify(_exhaustiveCheck)}`);
   }
 }
