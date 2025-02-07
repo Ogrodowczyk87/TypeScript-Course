@@ -4,6 +4,18 @@ type PagesMap = {
   contact: string;
 };
 
-type PagesAccess = {};
 
-export function checkAccess(map: PagesMap): PagesAccess {}
+type PagesAccess = {
+  homepage: boolean;
+  about: boolean;
+  contact: boolean;
+};
+
+
+export function checkAccess(map: PagesMap): PagesAccess {
+  return {
+    homepage: !!map.homepage,
+    about: !!map.about,
+    contact: !!map.contact,
+  };
+}
