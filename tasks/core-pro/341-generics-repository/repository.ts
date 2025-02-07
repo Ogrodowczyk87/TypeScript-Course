@@ -6,6 +6,7 @@ export interface User {
   email: string;
 }
 
+
 export class UserRepository {
   private dataAccess: DataAccess;
 

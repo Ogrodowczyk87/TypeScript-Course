@@ -1,5 +1,6 @@
 /*
-  Twoim zadaniem jest zrefaktoryzowanie istniejącego kodu w repository.ts: UserRepository i ProductRepository, tworząc generyczne repozytorium Repository<T>. Nowe repozytorium powinno obsługiwać operacje CRUD dla dowolnego typu danych i tabeli w bazie danych. Podstawą zaliczenia jest obsługa:
+  Twoim zadaniem jest zrefaktoryzowanie istniejącego kodu w repository.ts: UserRepository i ProductRepository, tworząc generyczne repozytorium Repository<T>. 
+  Nowe repozytorium powinno obsługiwać operacje CRUD dla dowolnego typu danych i tabeli w bazie danych. Podstawą zaliczenia jest obsługa:
   - getById
   - getAll
   - insert
