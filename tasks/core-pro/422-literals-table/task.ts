@@ -12,11 +12,6 @@ type Delete<Model, TableName extends Entities> = {
   [Prop in `delete${Capitalize<TableName>}`]: (id: number) => Model;
 };
 
-export type Table<Model, TableName extends Entities> = Get<Model, TableName> &
-  Update<Model, TableName> &
-  Delete<Model, TableName>;
-
-
   export type Table<T> = {
     getUser(id: number): T;
     deleteProduct(id: number): T;
