@@ -15,3 +15,10 @@ type Delete<Model, TableName extends Entities> = {
 export type Table<Model, TableName extends Entities> = Get<Model, TableName> &
   Update<Model, TableName> &
   Delete<Model, TableName>;
+
+
+  export type Table<T> = {
+    getUser(id: number): T;
+    deleteProduct(id: number): T;
+    updateOrder(id: number, update: Partial<T>): T;
+  };
