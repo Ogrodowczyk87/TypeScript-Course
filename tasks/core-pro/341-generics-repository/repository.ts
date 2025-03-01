@@ -6,69 +6,57 @@ export interface User {
   email: string;
 }
 
-
-export class UserRepository {
-  private dataAccess: DataAccess;
-
-  constructor(dataAccess: DataAccess) {
-    this.dataAccess = dataAccess;
-  }
-
-  async getById(id: number) {
-    const query = 'SELECT * FROM users WHERE id = $1';
-    const values = [id];
-    const res = await this.dataAccess.query<User>(query, values);
-    return res.rows[0];
-  }
-
-  async getAll() {
-    const query = 'SELECT * FROM users';
-    const res = await this.dataAccess.query<User>(query);
-    return res.rows;
-  }
-
-  async insert(user: Omit<User, 'id'>) {
-    const { name, email } = user;
-    const query = 'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *';
-    const values = [name, email];
-    const res = await this.dataAccess.query<User>(query, values);
-    return res.rows[0];
-  }
-}
-
 export interface Product {
   id?: number;
   name: string;
   price: number;
 }
 
-export class ProductRepository {
-  private dataAccess: DataAccess;
+// Generic repository class for all entity types
+export class Repository<T extends { id?: number }> {
+  protected dataAccess: DataAccess;
+  protected tableName: string;
 
-  constructor(dataAccess: DataAccess) {
+  constructor(dataAccess: DataAccess, tableName: string) {
     this.dataAccess = dataAccess;
+    this.tableName = tableName;
   }
 
-  async getById(id: number) {
-    const query = 'SELECT * FROM products WHERE id = $1';
+  async getById(id: number): Promise<T | undefined> {
+    const query = `SELECT * FROM ${this.tableName} WHERE id = $1`;
     const values = [id];
-    const res = await this.dataAccess.query<Product>(query, values);
+    const res = await this.dataAccess.query<T>(query, values);
     return res.rows[0];
   }
 
-  async getAll() {
-    const query = 'SELECT * FROM products';
-    const res = await this.dataAccess.query<Product>(query);
+  async getAll(): Promise<T[]> {
+    const query = `SELECT * FROM ${this.tableName}`;
+    const res = await this.dataAccess.query<T>(query);
     return res.rows;
   }
 
-  async insert(product: Omit<Product, 'id'>) {
-    const { name, price } = product;
-    const query = 'INSERT INTO products (name, price) VALUES ($1, $2) RETURNING *';
-    const values = [name, price];
-    const res = await this.dataAccess.query<Product>(query, values);
+  async insert(entity: Omit<T, 'id'>): Promise<T> {
+    const keys = Object.keys(entity);
+    const placeholders = keys.map((_, index) => `$${index + 1}`).join(', ');
+    const columns = keys.join(', ');
+    const values = Object.values(entity);
+
+    const query = `INSERT INTO ${this.tableName} (${columns}) VALUES (${placeholders}) RETURNING *`;
+    const res = await this.dataAccess.query<T>(query, values);
     return res.rows[0];
   }
 }
 
-export class Repository<T extends { id?: number }> {}
+// User-specific repository extending the generic repository
+export class UserRepository extends Repository<User> {
+  constructor(dataAccess: DataAccess) {
+    super(dataAccess, 'users');
+  }
+}
+
+// Product-specific repository extending the generic repository
+export class ProductRepository extends Repository<Product> {
+  constructor(dataAccess: DataAccess) {
+    super(dataAccess, 'products');
+  }
+}
