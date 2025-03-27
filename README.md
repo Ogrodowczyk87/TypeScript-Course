@@ -1,3 +1,4 @@
+nhpm i
 # Opanuj TypeScript - Repozytorium dla uczestnika
 
 ![](https://opanujtypescript.pl/img/logo-main.jpg)

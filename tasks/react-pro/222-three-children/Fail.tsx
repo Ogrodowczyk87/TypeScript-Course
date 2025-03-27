@@ -4,6 +4,7 @@ const FailTwoChildren = () => (
   <TripleContainer>
     <li>First</li>
     <li>Second</li>
+    {/* Błąd: Oczekiwano dokładnie 3 dzieci */}
   </TripleContainer>
 );
 
@@ -13,7 +14,17 @@ const FailFourChildren = () => (
     <li>Second</li>
     <li>Third</li>
     <li>Fourth</li>
+    {/* Błąd: Oczekiwano dokładnie 3 dzieci */}
   </TripleContainer>
 );
 
-export { FailFourChildren, FailTwoChildren };
+const PassThreeChildren = () => (
+  <TripleContainer>
+    <li>First</li>
+    <li>Second</li>
+    <li>Third</li>
+    {/* Poprawne użycie */}
+  </TripleContainer>
+);
+
+export { FailFourChildren, FailTwoChildren, PassThreeChildren };

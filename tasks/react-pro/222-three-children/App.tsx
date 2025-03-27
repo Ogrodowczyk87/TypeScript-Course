@@ -1,8 +1,16 @@
+import React from 'react';
+
 /*
   Dodaj typowanie propsa children dla TripleContainer, które wymusi przekazanie dokładnie trzech komponentów lub elementów HTML.
 */
 
-const TripleContainer = ({ children }) => <ul className="list-disc">{children}</ul>;
+type TripleContainerProps = {
+  children: [React.ReactNode, React.ReactNode, React.ReactNode];
+};
+
+export const TripleContainer: React.FC<TripleContainerProps> = ({ children }) => {
+  return <ul className="list-disc">{children}</ul>;
+};
 
 const App = () => (
   <TripleContainer>
@@ -13,5 +21,3 @@ const App = () => (
 );
 
 export default App;
-
-export { TripleContainer };
