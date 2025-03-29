@@ -9,8 +9,8 @@ export type ModernFeatureFlags = FlagsV2<FeatureFlags>;
 export function getFeatureFlagsV2(flags: FeatureFlags): ModernFeatureFlags {
   const flagsV2 = {
     isSearchEnabled: false,
-    isContactFormEnabled: false,
-    isCartEnabled: false,
+    isContactFormEnabled: true,
+    isCartEnabled: true,
   } as ModernFeatureFlags;
 
   for (const key in flags) {
