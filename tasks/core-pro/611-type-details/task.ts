@@ -6,9 +6,9 @@ type Rectangle = { kind: 'rectangle'; width: number; height: number };
 type Circle = { kind: 'circle'; radius: number };
 type Shape = Rectangle | Circle;
 
-const shapes: Record<string, Shape> = {
+const shapes = {
   shape1: { kind: 'rectangle', width: 10, height: 20 },
   shape2: { kind: 'circle', radius: 15 },
-};
+} satisfies Record<string, Shape>;
 
 console.log(shapes.shape1.width);
