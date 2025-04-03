@@ -6,6 +6,7 @@ const configurations = {
   enableLogs: true,
 };
 
-for (const key of Object.keys(configurations)) {
+
+for (const key of Object.keys(configurations) as Array<keyof typeof configurations>) {
   console.log(`${key} => ${configurations[key]}`);
 }
