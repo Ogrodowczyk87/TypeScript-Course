@@ -8,7 +8,7 @@ const config = {
     timeout: 5000,
   },
   debug: true,
-};
+} as const
 
 config.api.timeout = 10000;
 config.debug = false;
