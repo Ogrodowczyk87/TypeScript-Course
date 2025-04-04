@@ -16,11 +16,13 @@ const TagManager = () => {
   const [state, setState] = useState<TagState>({ tagSelected: null, tags: [] });
 
   const addTag = (tag: Tag) => {
-    setState((prevState) => ({
-      ...prevState,
-      tags: [...prevState.tags, tag],
-      extraProp: 'Nieprawidłowa właściwość', // Nadmiarowa właściwość
-    }));
+    setState((prevState): TagState => {
+      return {
+        ...prevState,
+        tags: [...prevState.tags, tag],
+      }
+      
+    });
   };
 
   return (
