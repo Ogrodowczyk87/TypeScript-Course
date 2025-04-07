@@ -1,13 +1,20 @@
-/* Napraw błędy typowania w poniższym generycznym komponencie FormComponent, który używa fixedForwardRef do przekazywania referencji do elementu form:
-1. Dodaj pełną implementację fixedForwardRef, która zapewni poprawną inferencje typów.
-2. Zadbaj o poprawne typowanie propsów i referencji.
-3. Zadbaj o poprawne typowanie handlerów i stanu.
-*/
+import { FormEvent, useRef, useState } from 'react';
+import { fixedForwardRef } from './fixed-forward-ref';
 
-import { useRef, useState } from 'react';
-import { fixedForwardRef } from './fixed-foward-ref';
 
-const FormComponent = fixedForwardRef((props: any, ref) => {
+interface FormData {
+  name: string;
+  email: string;
+  age: number;
+  occupation: string;
+  bio: string;
+}
+interface FormComponentProps {
+  initialData: FormData;
+  handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
+}
+
+const FormComponent = fixedForwardRef<HTMLFormElement, FormComponentProps>((props, ref) => {
   return (
     <form
       ref={ref}
@@ -101,23 +108,23 @@ const FormComponent = fixedForwardRef((props: any, ref) => {
 });
 
 const App = () => {
-  const formRef = useRef(null);
-  const [submittedData, setSubmittedData] = useState(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [submittedData, setSubmittedData] = useState<FormData | null>(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get('name'),
-      email: formData.get('email'),
+    const data: FormData = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
       age: Number(formData.get('age')),
-      occupation: formData.get('occupation'),
-      bio: formData.get('bio'),
+      occupation: formData.get('occupation') as string,
+      bio: formData.get('bio') as string,
     };
     setSubmittedData(data);
   };
 
-  const initialData = {
+  const initialData: FormData = {
     name: '',
     email: '',
     age: 0,
