@@ -2,11 +2,27 @@
 
 import { useReducer, useState } from 'react';
 
-const taskReducer = (state, action) => {
+interface Task {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
+interface State {
+  tasks: Task[];
+}
+
+type Action = 
+  | { type: 'add'; payload: string }
+  | { type: 'remove'; payload: number }
+  | { type: 'toggle'; payload: number };
+
+const taskReducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case 'add':
+    case 'add': {
       const newTask = { id: Date.now(), text: action.payload, completed: false };
       return { tasks: [...state.tasks, newTask] };
+    }
     case 'remove':
       return { tasks: state.tasks.filter((task) => task.id !== action.payload) };
     case 'toggle':
@@ -16,13 +32,13 @@ const taskReducer = (state, action) => {
         ),
       };
     default:
-      throw new Error(`Unhandled action type: ${action.type}`);
+      throw new Error(`Unhandled action type: ${action}`);
   }
 };
 
 const TaskList = () => {
   const [state, dispatch] = useReducer(taskReducer, { tasks: [] });
-  const [newTask, setNewTask] = useState('');
+  const [newTask, setNewTask] = useState<string>('');
 
   const handleAdd = () => {
     if (newTask.trim() !== '') {
@@ -42,10 +58,7 @@ const TaskList = () => {
           className="flex-1 px-4 py-2 text-gray-200 placeholder-gray-400 bg-gray-700 border border-gray-600 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
         />
-        <button
-          onClick={handleAdd}
-          className="px-6 py-2 font-medium text-white transition-colors duration-200 bg-blue-500 rounded-lg hover:bg-blue-600"
-        >
+        <button type="button" onClick={handleAdd} className="px-6 py-2 font-medium text-white transition-colors duration-200 bg-blue-500 rounded-lg hover:bg-blue-600">
           Add Task
         </button>
       </div>
@@ -57,6 +70,7 @@ const TaskList = () => {
           >
             <span
               onClick={() => dispatch({ type: 'toggle', payload: task.id })}
+              onKeyUp={(e) => e.key === 'Enter' && dispatch({ type: 'toggle', payload: task.id })}
               className={`flex-1 cursor-pointer ${
                 task.completed ? 'line-through text-gray-400' : 'text-gray-200'
               }`}
@@ -64,6 +78,7 @@ const TaskList = () => {
               {task.text}
             </span>
             <button
+              type="button"
               onClick={() => dispatch({ type: 'remove', payload: task.id })}
               className="px-3 py-1 text-sm text-white transition-all duration-200 bg-red-500 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-600"
             >
