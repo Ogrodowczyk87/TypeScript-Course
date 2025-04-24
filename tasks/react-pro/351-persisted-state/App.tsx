@@ -7,10 +7,17 @@ import { useState } from 'react';
 import { usePersistedState } from './use-persisted-state';
 
 const App = () => {
-  const [key, setKey] = useState('');
+  const [key, setKey] = useState(''); 
   const [inputValue, setKeyValue] = useState('');
   const [currentKey, setCurrentKey] = useState<string | null>(null);
-  const [persistedValue, setPersistedValue] = usePersistedState(currentKey || 'default-key');
+
+  // Case 1: With only the key parameter
+  const [persistedValue, setPersistedValue] = usePersistedState<string | undefined>(
+    currentKey || 'default-key'
+  );
+
+  // Case 2: With key and initial parameters
+  const [defaultValue] = usePersistedState('default-key', 'Default Value');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +81,7 @@ const App = () => {
             <span className="font-medium">Key:</span> {currentKey}
           </p>
           <p>
-            <span className="font-medium">Value:</span> {persistedValue}
+            <span className="font-medium">Value:</span> {persistedValue || defaultValue}
           </p>
         </div>
       )}
