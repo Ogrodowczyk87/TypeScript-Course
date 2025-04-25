@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { join } from 'path';
+import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { getCompilerDiagnostics } from '../../../utils/ts-utils.ts';
 import App from './App.tsx';

@@ -13,6 +13,7 @@ const App = () => {
       <p>To jest tylko przykładowy komponent, możesz przejść do pierwszego zadania. Powodzenia!</p>
       <p className="pt-4 mb-6 text-2xl text-blue-400">Current count: {count}</p>
       <button
+        type="button"
         onClick={handleIncrement}
         className="px-6 py-2 font-semibold text-white transition duration-200 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-600 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
       >

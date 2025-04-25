@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { getProducts } from './api/api';
-import { Product } from './model/Product';
+import type { Product } from './model/Product';
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('phone');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = async (withDelay: boolean = false) => {
+  const handleSearch = async (withDelay = false) => {
     setIsLoading(true);
 
     const {
@@ -29,18 +29,20 @@ export default function App() {
       />
       <div className="flex flex-row gap-4">
         <button
-          // onClick={() => handleSearch()}
+          type="button"
+          onClick={() => handleSearch()}
           data-testid="search-button-new"
           className="px-4 py-2 text-white bg-teal-500 rounded hover:bg-teal-600 font-bold min-w-64"
         >
           Search (NEW)
-        </button>
         <button
-          // onClick={() => handleSearch(true)}
+          type="button"
+          onClick={() => handleSearch(true)}
           data-testid="search-button-legacy"
           className="px-4 py-2 text-white bg-sky-500 rounded hover:bg-sky-600 font-bold min-w-64"
         >
           Search (Legacy)
+        </button>
         </button>
       </div>
       {isLoading ? (
