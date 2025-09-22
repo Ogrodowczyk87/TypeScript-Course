@@ -13,6 +13,7 @@ interface RequestConfigWithMetadata extends InternalAxiosRequestConfig {
 }
 
 function trackSlowRequests(url: string, duration: number) {
+  // Always call the tracker API - the threshold check is done in the interceptor
   axios.post('/api/tracker', {
     duration: duration,
     url: url,
@@ -26,40 +27,40 @@ const productsApi = axios.create({
 // Add request interceptor to track when the request starts
 productsApi.interceptors.request.use((config: RequestConfigWithMetadata) => {
   // Store request start time in config metadata
-  config.metadata = { startTime: new Date().getTime() };
+  config.metadata = { startTime: Date.now() };
   return config;
 }, (error) => {
   return Promise.reject(error);
 });
 
 // Add response interceptor to calculate and track response time
-productsApi.interceptors.response.use((response: AxiosResponse & {config: RequestConfigWithMetadata}) => {
+productsApi.interceptors.response.use((response: AxiosResponse & { config: RequestConfigWithMetadata }) => {
   // Calculate response time
-  const endTime = new Date().getTime();
+  const endTime = Date.now();
   const startTime = response.config.metadata?.startTime || 0;
   const responseTime = endTime - startTime;
-  
-  // Only track if the request is slow (exceeds threshold)
+
+  // Only track slow requests (exceeding threshold)
   if (responseTime > SLOW_REQUEST_THRESHOLD) {
     const url = response.config.url || '';
     trackSlowRequests(url, responseTime);
   }
-  
+
   return response;
 }, (error) => {
   // Handle errors - still track response time for failed requests
   if (error.config?.metadata) {
-    const endTime = new Date().getTime();
+    const endTime = Date.now();
     const startTime = error.config.metadata.startTime;
     const responseTime = endTime - startTime;
-    
+
     // Only track slow failed requests
     if (responseTime > SLOW_REQUEST_THRESHOLD) {
       const url = error.config.url || '';
       trackSlowRequests(url, responseTime);
     }
   }
-  
+
   return Promise.reject(error);
 });
 

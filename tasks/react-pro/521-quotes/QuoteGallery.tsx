@@ -1,39 +1,44 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Quote as QuoteIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getQuotes } from './api/quotes-api';
-import { QuotesResponse } from './model/QuotesResponse';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+
+export interface QuotesResponse {
+  total: number;
+  quotes: {
+    id: number;
+    quote: string;
+    author: string;
+  }[];
+}
+
+export async function getQuotes(page: number, limit: number): Promise<QuotesResponse> {
+  const response = await axios.get<QuotesResponse>('/quotes', {
+    params: { page, limit },
+  });
+  return response.data;
+}
 
 export function QuoteGallery() {
   const [page, setPage] = useState(0);
-  const [data, setData] = useState<QuotesResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const limit = '5';
+  const limit = 5;
 
-  useEffect(() => {
-    const fetchQuotes = async () => {
-      setIsLoading(true);
-      try {
-        const response = await getQuotes(page, limit);
-        setData(response);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuotes();
-  }, [page]);
+  // Use React Query to fetch quotes
+  const { data, isLoading, isError } = useQuery<QuotesResponse>({
+    queryKey: ['quotes', page],
+    queryFn: () => getQuotes(page, limit),
+    staleTime: 5000, // Cache data for 5 seconds to allow smooth transitions
+  });
 
   if (isLoading) {
     return <div className="text-gray-200">Loading...</div>;
   }
 
-  if (!data) {
-    return null;
+  if (isError || !data) {
+    return <div className="text-red-500">Failed to load quotes.</div>;
   }
 
-  const totalPages = Math.ceil(data.total / limit);
+  const totalPages = Math.ceil((data.total || 0) / limit);
 
   return (
     <div className="flex flex-col gap-4">
@@ -59,7 +64,7 @@ export function QuoteGallery() {
         <button
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           data-testid="previous-page-button"
-          disabled={page === -1}
+          disabled={page === 0}
           className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg disabled:bg-gray-900 disabled:text-gray-600 hover:bg-gray-700 transition-colors flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" />

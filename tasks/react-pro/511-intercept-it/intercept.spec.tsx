@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { describe, test } from 'vitest';
 import { getCompilerDiagnostics } from '../../../utils/ts-utils';
 import App from './App';
