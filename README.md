@@ -33,6 +33,8 @@ npm run list <nazwa-modułu> -- --watch
 npm run verify <nazwa-zadania> # np. 004-literals-code lub literals-code
 ```
 
+**Uwaga:** Zaliczone zadania są automatycznie zapisywane w systemie śledzenia postępów i będą widoczne w dashboard (`npm run summary`).
+
 Tryb obserwatora:
 
 ```bash

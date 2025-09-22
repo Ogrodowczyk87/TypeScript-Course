@@ -112,13 +112,34 @@ function getAllChallenges(results, moduleName, tracker) {
     if (levelCode && LEVEL_DEFINITIONS[moduleName][levelCode[0]]) {
       const levelInfo = LEVEL_DEFINITIONS[moduleName][levelCode[0]];
       const testDetails = getTestDetails(suite);
-      const passedTests = testDetails.filter((test) => test.status === 'passed').length;
+      let passedTests = testDetails.filter((test) => test.status === 'passed').length;
       const totalTests = testDetails.length;
 
-      const challengeName = suite.name
-        .split('/')
-        .pop()
-        .replace(/\.spec\.tsx?$/, '');
+      // Try to derive challenge name from folder (e.g. '/511-intercept-it/')
+      let challengeName = null;
+      const folderMatch = suite.name.match(/\/(\d{3}-[^\/]+)\//);
+      if (folderMatch) {
+        // remove numeric prefix (e.g. '511-intercept-it' -> 'intercept-it')
+        challengeName = folderMatch[1].replace(/^\d+-/, '');
+      } else {
+        // fallback to filename-based name extraction
+        challengeName = suite.name
+          .split('/')
+          .pop()
+          .replace(/\.spec\.tsx?$/, '');
+      }
+
+      // determine status, prioritizing tracker in getChallengeStatus
+      const status = getChallengeStatus(
+        { challengeName, moduleName },
+        { totalTests, passedTests },
+        tracker,
+      );
+
+      // If tracker marks it complete, show full progress in UI
+      if (status === 'complete' && tracker && tracker[moduleName] && isChallengeMarkedInTracker(moduleName, challengeName, tracker)) {
+        passedTests = totalTests;
+      }
 
       challenges.push({
         name: challengeName,
@@ -127,11 +148,7 @@ function getAllChallenges(results, moduleName, tracker) {
         levelCode,
         passedTests,
         totalTests,
-        status: getChallengeStatus(
-          { challengeName, moduleName },
-          { totalTests, passedTests },
-          tracker,
-        ),
+        status,
         testDetails,
       });
     }
@@ -147,16 +164,40 @@ function getAllChallenges(results, moduleName, tracker) {
   });
 }
 
+function isChallengeMarkedInTracker(moduleName, challengeName, tracker) {
+  if (!tracker || !tracker[moduleName]) return false;
+  // Check multiple variants: exact, without hyphens, lowercase
+  const variants = [
+    challengeName,
+    challengeName.replace(/-/g, ''),
+    challengeName.toLowerCase(),
+  ];
+
+  return variants.some((v) => Boolean(tracker[moduleName][v]));
+}
+
 function getChallengeStatus(challenge, tests, tracker) {
   const moduleName = challenge.moduleName;
   const challengeName = challenge.challengeName;
-  const challengeInTracker = tracker && tracker[moduleName][challengeName];
+  const challengeInTracker = isChallengeMarkedInTracker(moduleName, challengeName, tracker);
 
-  return tests.passedTests === tests.totalTests
-    ? 'complete'
-    : tests.passedTests > 0 && challengeInTracker
-      ? 'partial'
-      : 'incomplete';
+  // If the challenge is marked as complete in the tracker, prioritize it
+  if (challengeInTracker) {
+    return 'complete';
+  }
+
+  // If all tests pass, it's complete
+  if (tests.passedTests === tests.totalTests) {
+    return 'complete';
+  }
+
+  // If some tests pass, it's partial
+  if (tests.passedTests > 0) {
+    return 'partial';
+  }
+
+  // Otherwise, it's incomplete
+  return 'incomplete';
 }
 
 function getChallengeLevel(testName) {
@@ -189,21 +230,20 @@ function renderChallenges(results, moduleName, tracker) {
   const gridHtml = `
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       ${challenges
-        .map(
-          (challenge, idx) => `
+      .map(
+        (challenge, idx) => `
           <div class="challenge-card rounded-xl ${getStatusColor(
-            challenge.status,
-          )} card-hover aspect-square flex flex-col">
+          challenge.status,
+        )} card-hover aspect-square flex flex-col">
             <div class="p-4 flex-1 cursor-pointer flex flex-col" onclick="toggleTestDetails('${moduleName}', '${idx}')">
               <div class="flex flex-col gap-2 mb-4">
                 <div class="text-blue-400/80 text-xs font-medium tracking-wider">${challenge.levelName}</div>
                 <div class="flex items-start justify-between gap-2">
-                  <h3 class="font-medium text-white/90 uppercase tracking-wide text-sm">${
-                    challenge.name
-                  }</h3>
+                  <h3 class="font-medium text-white/90 uppercase tracking-wide text-sm">${challenge.name
+          }</h3>
                   <span class="text-lg shrink-0" title="${challenge.status}">${getStatusIcon(
-                    challenge.status,
-                  )}</span>
+            challenge.status,
+          )}</span>
                 </div>
               </div>
               <div class="mt-auto">
@@ -219,25 +259,24 @@ function renderChallenges(results, moduleName, tracker) {
             <div id="details-${moduleName}-${idx}" class="hidden border-t border-white/5">
               <div class="p-4 space-y-2 max-h-48 overflow-y-auto">
                 ${challenge.testDetails
-                  .map(
-                    (test) => `
+            .map(
+              (test) => `
                     <div class="flex items-center justify-between gap-2 text-sm">
                       <span class="text-white/70 truncate">${test.name}</span>
-                      <span class="${
-                        test.status === 'passed' ? 'text-lime-400' : 'text-slate-400'
-                      } shrink-0">${getStatusIcon(
-                        test.status === 'passed' ? 'complete' : 'incomplete',
-                      )}</span>
+                      <span class="${test.status === 'passed' ? 'text-lime-400' : 'text-slate-400'
+                } shrink-0">${getStatusIcon(
+                  test.status === 'passed' ? 'complete' : 'incomplete',
+                )}</span>
                     </div>
                   `,
-                  )
-                  .join('')}
+            )
+            .join('')}
               </div>
             </div>
           </div>
         `,
-        )
-        .join('')}
+      )
+      .join('')}
     </div>
   `;
 
