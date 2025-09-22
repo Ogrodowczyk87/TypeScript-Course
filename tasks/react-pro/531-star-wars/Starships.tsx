@@ -1,70 +1,59 @@
-import { AlertCircle, ChevronLeft, ChevronRight, Loader, Rocket } from 'lucide-react';
-import { StarshipCard } from './StarshipCard';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getStarships } from './api/starships';
+import { Starship } from './types/starships';
 
-export default function Starships() {
-  const [page, setPage] = useState(1);
-  const [data] = useState(null);
-  const [isLoading] = useState(false);
-  const [isError] = useState(false);
+const Starships: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['starships', currentPage],
+    queryFn: () => getStarships(currentPage),
+  });
 
   if (isLoading) {
-    return (
-      <div
-        data-testid="loading-state"
-        className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center"
-      >
-        <Loader className="w-8 h-8 animate-spin text-blue-500" />
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
-  if (isError) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center">
-        <AlertCircle className="w-8 h-8 text-red-500 mr-2" />
-        <span>Failed to load starships</span>
-      </div>
-    );
+  if (error) {
+    return <div>Error loading starships</div>;
   }
 
-  const starships = data?.data.results || [];
-  const hasNextPage = !!data?.data.next;
-  const hasPrevPage = !!data?.data.previous;
+  const starships = data?.results || [];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-8 flex items-center">
-        <Rocket className="w-8 h-8 mr-2 text-blue-500" />
-        Star Wars Starships
-      </h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {starships.map((ship) => (
-          <StarshipCard key={ship.url} ship={ship} />
+    <div>
+      <div className="grid gap-4">
+        {starships.map((starship: Starship, index: number) => (
+          <div key={`${starship.name}-${index}`} className="p-4 border rounded">
+            <h3>{starship.name}</h3>
+            <p>Model: {starship.model}</p>
+            <p>Class: {starship.starship_class}</p>
+          </div>
         ))}
       </div>
 
-      <div className="flex justify-center gap-4 mt-8">
+      <div className="flex justify-center mt-4">
         <button
-          onClick={() => setPage(page - 1)}
-          data-testid="previous-button"
-          disabled={!hasPrevPage}
-          className="flex items-center px-4 py-2 bg-blue-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-48"
+          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+          data-testid="prev-button"
+          className="mx-2 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
         >
-          <ChevronLeft className="w-5 h-5 mr-1" />
           Previous
         </button>
+
         <button
-          onClick={() => setPage(page + 1)}
-          disabled={!hasNextPage}
+          onClick={() => setCurrentPage(prev => prev + 1)}
+          disabled={!data?.next}
           data-testid="next-button"
-          className="flex items-center px-4 py-2 bg-blue-500 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-48"
+          className="mx-2 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
         >
           Next
-          <ChevronRight className="w-5 h-5 ml-1" />
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default Starships;
