@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Cart, CartSchema } from './Cart';
 
 export default function App() {
 
@@ -31,7 +33,7 @@ export default function App() {
 
   const items = watch("items");
   const calculatedTotal = items.reduce(
-    (sum, item) => sum + (item.price || 0) * (item.quantity || 0) * 2,
+    (sum, item) => sum + (item.price || 0) * (item.quantity || 0),
     0
   );
 
@@ -98,7 +100,7 @@ export default function App() {
                 </div>
               ))}
               {errors.items && (
-                <p className="text-red-400 text-sm" data-testid="items-error">{errors.items.message}</p>
+                <p className="text-red-400 text-sm" data-testid="items-error">{errors.items.message as string}</p>
               )}
               <button
                 type="button"
@@ -114,18 +116,14 @@ export default function App() {
           <div>
             <label className="block text-sm font-medium mb-1">Total</label>
             <input
-              {...register("total")}
+              {...register("total", { valueAsNumber: true })}
               type="number"
               step="0.01"
               readOnly
-              value={calculatedTotal.toFixed(2)}
-              className="w-full font-bold text-xlrounded bg-gray-700 cursor-not-allowed"
+              className="w-full font-bold text-xl rounded bg-gray-700 cursor-not-allowed"
             />
             {errors.total && (
-              <p className="text-red-400 text-sm" data-testid="total-error">{errors.total.message}</p>
-            )}
-            {errors.sum && (
-              <p className="text-red-400 text-sm" data-testid="total-error">{errors.sum.message}</p>
+              <p className="text-red-400 text-sm" data-testid="total-error">{errors.total.message as string}</p>
             )}
           </div>
         </div>

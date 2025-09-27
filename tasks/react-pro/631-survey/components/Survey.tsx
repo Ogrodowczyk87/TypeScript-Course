@@ -102,7 +102,6 @@ const Submit: React.FC<SubmitProps> = ({ children, className }) => (
   </button>
 );
 
-// Attach compound components with proper typing
 Survey.ShortAnswer = ShortAnswer;
 Survey.LongAnswer = LongAnswer;
 Survey.Choice = Choice;
